@@ -14,7 +14,7 @@ To run copying task with time delay of `300` steps using h-detach with `0.5` pro
 
 `python copying.py --save-dir=enter_experiment_dir_name_here --p-detach=0.5 --T=300 --seed=3`
 
-To run copying trask without h-detach, execute the following command:
+To run copying task without h-detach, execute the following command:
 
 `python copying.py --save-dir=enter_experiment_dir_name_here --T=300 --seed=3`
 
