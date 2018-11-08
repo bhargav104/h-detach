@@ -23,11 +23,11 @@ parser.add_argument('--lr', type=float, default=0.001, help='learning rate for a
 parser.add_argument('--clipval', type=float, default=1., help='gradient clipping value')
 parser.add_argument('--batch_size', type=int, default=100, help='batch size')
 parser.add_argument('--n_epochs', type=int, default=200, help='number of epochs')
-parser.add_argument('--anneal-p', type=int, default=0, help='number of epochs before total number of epochs for setting p-detach to 0')
+parser.add_argument('--anneal-p', type=int, default=40, help='number of epochs before total number of epochs for setting p-detach to 0')
 
 
 args = parser.parse_args()
-# log_dir = '/directory/to/save/experiments/'+args.save_dir + '/'
+log_dir = '/directory/to/save/experiments/'+args.save_dir + '/'
 
 
 # if os.path.isdir(log_dir):
