@@ -37,3 +37,7 @@ To run permuted pixel MNIST, execute,
 `python pixelmnist.py --p-detach=0.25 --seed=150 --permute --save-dir=enter_experiment_dir_name_here`
 
 We experimented with multiple seeds (around 5), and picked the model with the best validation accuracy to report the final test performance. On our machine a seed of `150` gives the best validation model with test accuracy `92.3%`.
+
+## Image Captioning
+
+The code for image captioning experiments can be found in the other branch called `captioning`.
