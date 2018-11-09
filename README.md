@@ -46,7 +46,7 @@ $ python train.py --id st --caption_model show_tell --input_json /folder/cocotal
 $ python train.py --id sat --caption_model show_attend_tell --input_json /folder/cocotalk.json --input_fc_dir /folder/cocotalk_fc --input_att_dir /folder/cocotalk_att --input_label_h5 /folder/cocotalk_label.h5 --batch_size 10  --checkpoint_path logs/coco_152_sat_baseline --save_checkpoint_every 6000 --val_images_use 5000 --max_epochs 30 --language_eval 1 --learning_rate 0.0001 --save_dir=sat-baseline --p-detach=0.4
 ```
 
-The train script will dump checkpoints into the folder specified by `--checkpoint_path` (default = `save/`). We only save the best-performing checkpoint on validation and the latest checkpoint to save disk space. Also, replace "folder" with the corresponding folder where the respective file is located.
+The train script will dump checkpoints into the folder specified by `--checkpoint_path` (default = `save/`). We only save the best-performing checkpoint on validation and the latest checkpoint to save disk space. Also, replace "folder" with the corresponding folder where the respective file is located. With the first command (Show and Tell) we get a CIDEr score of 98.0 and with the second command (Show Attend Tell) we get a score of 103.3 on the test set.
 
 To resume training, you can specify `--start_from` option to be the path saving `infos.pkl` and `model.pth` (usually you could just set `--start_from` and `--checkpoint_path` to be the same).
 
