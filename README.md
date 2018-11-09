@@ -33,7 +33,7 @@ $ python scripts/prepro_feats.py --input_json data/dataset_coco.json --output_di
 
 `prepro_labels.py` will map all words that occur <= 5 times to a special `UNK` token, and create a vocabulary for all the remaining words. The image information and vocabulary are dumped into `data/cocotalk.json` and discretized caption data are dumped into `data/cocotalk_label.h5`.
 
-`prepro_feats.py` extract the resnet101 features (both fc feature and last conv feature) of each image. The features are saved in `data/cocotalk_fc` and `data/cocotalk_att`, and resulting files are about 200GB.
+`prepro_feats.py` extract the resnet152 features (both fc feature and last conv feature) of each image. The features are saved in `data/cocotalk_fc` and `data/cocotalk_att`, and resulting files are about 200GB.
 
 (Check the prepro scripts for more options, like other resnet models or other attention sizes.)
 
