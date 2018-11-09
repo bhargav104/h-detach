@@ -1,3 +1,25 @@
+# Neuraltalk2-pytorch
+
+Changes compared to neuraltalk2.
+- Instead of using random split, we use [karpathy's train-val-test split](http://cs.stanford.edu/people/karpathy/deepimagesent/caption_datasets.zip).
+- Instead of including the convnet in the model, we use preprocessed features. (finetuneable cnn version is in the branch **with_finetune**)
+- Use resnet instead of vgg; the feature extraction method is the same as in self-critical: run cnn on original image and adaptively average pool the last conv layer feature to fixed size .
+- Much more models (you can check out models folder). The latest topdown model can achieve 1.07 Cider score on Karpathy's test split with beam size 5.
+
+## Requirements
+Python 2.7 (because there is no [coco-caption](https://github.com/tylin/coco-caption) version for python 3)
+PyTorch 0.2 (along with torchvision)
+
+You need to download pretrained resnet model for both training and evaluation. The models can be downloaded from [here](https://drive.google.com/open?id=0B7fNdx_jAqhtbVYzOURMdDNHSGM), and should be placed in `data/imagenet_weights`.
+
+
+## Pretrained models
+Pretrained models are provided [here](https://drive.google.com/open?id=0B7fNdx_jAqhtcXp0aFlWSnJmb0k). And the performances of each model will be maintained in this [issue](https://github.com/ruotianluo/neuraltalk2.pytorch/issues/10).
+
+If you want to do evaluation only, then you can follow [this section](#generate-image-captions) after downloading the pretrained models.
+
+## Train your own network on COCO
+
 ### Download COCO dataset and preprocessing
 
 First, download the coco images from [link](http://mscoco.org/dataset/#download). We need 2014 training images and 2014 val. images. You should put the `train2014/` and `val2014/` in the same directory, denoted as `$IMAGE_ROOT`.
@@ -36,62 +58,45 @@ The current command use scheduled sampling, you can also set scheduled_sampling_
 If you'd like to evaluate BLEU/METEOR/CIDEr scores during training in addition to validation cross entropy loss, use `--language_eval 1` option, but don't forget to download the [coco-caption code](https://github.com/tylin/coco-caption) into `coco-caption` directory.
 
 For more options, see `opts.py`. 
- 
-After generating features using a Resnet-152. These are the following commands to run the captioning experiment codes. Replace "folder" with the name of the corresponding folder where that file is present.
 
-Commands 
-- Show and Tell - python train.py --id st --caption_model show_tell --input_json folder/cocotalk.json --input_fc_dir folder/cocotalk_fc --input_att_dir folder/cocotalk_att --input_label_h5 /folder/cocotalk_label.h5 --batch_size 10  --checkpoint_path logs/coco_152_st_baseline --save_checkpoint_every 6000 --val_images_use 5000 --max_epochs 30 --language_eval 1 --learning_rate 0.0001 --save_dir=st-baseline --p-detach=0.4
+**A few notes on training.** To give you an idea, with the default settings one epoch of MS COCO images is about 11000 iterations. After 1 epoch of training results in validation loss ~2.5 and CIDEr score of ~0.68. By iteration 60,000 CIDEr climbs up to about ~0.84 (validation loss at about 2.4 (under scheduled sampling)).
 
-- Show Attend Tell - python train.py --id sat --caption_model show_attend_tell --input_json /folder/cocotalk.json --input_fc_dir /folder/cocotalk_fc --input_att_dir /folder/cocotalk_att --input_label_h5 folder/cocotalk_label.h5 --batch_size 10  --checkpoint_path logs/coco_152_sat_baseline --save_checkpoint_every 6000 --val_images_use 5000 --max_epochs 30 --language_eval 1 --learning_rate 0.0001 --save_dir=sat-baseline --p-detach=0.4
+## Generate image captions
 
+### Evaluate on raw images
+Now place all your images of interest into a folder, e.g. `blah`, and run
+the eval script:
 
-## Requirements ##
-- java 1.8.0
-- python 2.7
+```bash
+$ python eval.py --model model.pth --infos_path infos.pkl --image_folder blah --num_images 10
+```
 
-## Files ##
-- cocoEvalCapDemo.py (demo script)
+This tells the `eval` script to run up to 10 images from the given folder. If you have a big GPU you can speed up the evaluation by increasing `batch_size`. Use `--num_images -1` to process all images. The eval script will create an `vis.json` file inside the `vis` folder, which can then be visualized with the provided HTML interface:
 
-./annotation
-- captions_val2014.json (MS COCO 2014 caption validation set)
-- Visit MS COCO [download](http://mscoco.org/dataset/#download) page for more details.
+```bash
+$ cd vis
+$ python -m SimpleHTTPServer
+```
 
-./results
-- captions_val2014_fakecap_results.json (an example of fake results for running demo)
-- Visit MS COCO [format](http://mscoco.org/dataset/#format) page for more details.
+Now visit `localhost:8000` in your browser and you should see your predicted captions.
 
-./pycocoevalcap: The folder where all evaluation codes are stored.
-- evals.py: The file includes COCOEavlCap class that can be used to evaluate results on COCO.
-- tokenizer: Python wrapper of Stanford CoreNLP PTBTokenizer
-- bleu: Bleu evalutation codes
-- meteor: Meteor evaluation codes
-- rouge: Rouge-L evaluation codes
-- cider: CIDEr evaluation codes
-- spice: SPICE evaluation codes
+### Evaluate on Karpathy's test split
 
-## Setup ##
+```bash
+$ python eval.py --dump_images 0 --num_images 5000 --model model.pth --infos_path infos.pkl --language_eval 1 
+```
 
-- You will first need to download the [Stanford CoreNLP 3.6.0](http://stanfordnlp.github.io/CoreNLP/index.html) code and models for use by SPICE. To do this, run:
-    ./get_stanford_models.sh
-- Note: SPICE will try to create a cache of parsed sentences in ./pycocoevalcap/spice/cache/. This dramatically speeds up repeated evaluations. The cache directory can be moved by setting 'CACHE_DIR' in ./pycocoevalcap/spice. In the same file, caching can be turned off by removing the '-cache' argument to 'spice_cmd'. 
+The defualt split to evaluate is test. The default inference method is greedy decoding (`--sample_max 1`), to sample from the posterior, set `--sample_max 0`.
 
-## References ##
+**Beam Search**. Beam search can increase the performance of the search for greedy decoding sequence by ~5%. However, this is a little more expensive. To turn on the beam search, use `--beam_size N`, N should be greater than 1.
 
-- [Microsoft COCO Captions: Data Collection and Evaluation Server](http://arxiv.org/abs/1504.00325)
-- PTBTokenizer: We use the [Stanford Tokenizer](http://nlp.stanford.edu/software/tokenizer.shtml) which is included in [Stanford CoreNLP 3.4.1](http://nlp.stanford.edu/software/corenlp.shtml).
-- BLEU: [BLEU: a Method for Automatic Evaluation of Machine Translation](http://www.aclweb.org/anthology/P02-1040.pdf)
-- Meteor: [Project page](http://www.cs.cmu.edu/~alavie/METEOR/) with related publications. We use the latest version (1.5) of the [Code](https://github.com/mjdenkowski/meteor). Changes have been made to the source code to properly aggreate the statistics for the entire corpus.
-- Rouge-L: [ROUGE: A Package for Automatic Evaluation of Summaries](http://anthology.aclweb.org/W/W04/W04-1013.pdf)
-- CIDEr: [CIDEr: Consensus-based Image Description Evaluation](http://arxiv.org/pdf/1411.5726.pdf)
-- SPICE: [SPICE: Semantic Propositional Image Caption Evaluation](https://arxiv.org/abs/1607.08822)
+## Miscellanea
+**Using cpu**. The code is currently defaultly using gpu; there is even no option for switching. If someone highly needs a cpu model, please open an issue; I can potentially create a cpu checkpoint and modify the eval.py to run the model on cpu. However, there's no point using cpu to train the model.
 
-## Developers ##
-- Xinlei Chen (CMU)
-- Hao Fang (University of Washington)
-- Tsung-Yi Lin (Cornell)
-- Ramakrishna Vedantam (Virgina Tech)
+**Train on other dataset**. It should be trivial to port if you can create a file like `dataset_coco.json` for your own dataset.
 
-## Acknowledgement ##
-- David Chiang (University of Norte Dame)
-- Michael Denkowski (CMU)
-- Alexander Rush (Harvard University)
+**Live demo**. Not supported now. Welcome pull request.
+
+## Acknowledgements
+
+Thanks the original [neuraltalk2](https://github.com/karpathy/neuraltalk2) and awesome PyTorch team.
