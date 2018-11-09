@@ -101,3 +101,4 @@ The defualt split to evaluate is test. The default inference method is greedy de
 ## Acknowledgements
 
 Thanks the original [neuraltalk2](https://github.com/karpathy/neuraltalk2) and awesome PyTorch team.
+Thanks to the creators of the repository - https://github.com/nke001/Twinnet_imagecaption, whose readme we have augmented.
