@@ -6,9 +6,9 @@ Evaluation codes for MS COCO caption generation.
 After generating features using a Resnet-152. These are the following commands to run the captioning experiment codes. Replace "folder" with the name of the corresponding folder where that file is present.
 
 Commands 
-- # Show and Tell # - python train.py --id st --caption_model show_tell --input_json folder/cocotalk.json --input_fc_dir folder/cocotalk_fc --input_att_dir folder/cocotalk_att --input_label_h5 /folder/cocotalk_label.h5 --batch_size 10  --checkpoint_path logs/coco_152_st_baseline --save_checkpoint_every 6000 --val_images_use 5000 --max_epochs 30 --language_eval 1 --learning_rate 0.0001 --save_dir=st-baseline --p-detach=0.4
+- Show and Tell - python train.py --id st --caption_model show_tell --input_json folder/cocotalk.json --input_fc_dir folder/cocotalk_fc --input_att_dir folder/cocotalk_att --input_label_h5 /folder/cocotalk_label.h5 --batch_size 10  --checkpoint_path logs/coco_152_st_baseline --save_checkpoint_every 6000 --val_images_use 5000 --max_epochs 30 --language_eval 1 --learning_rate 0.0001 --save_dir=st-baseline --p-detach=0.4
 
-- ## Show Attend Tell ## - python train.py --id sat --caption_model show_attend_tell --input_json /folder/cocotalk.json --input_fc_dir /folder/cocotalk_fc --input_att_dir /folder/cocotalk_att --input_label_h5 folder/cocotalk_label.h5 --batch_size 10  --checkpoint_path logs/coco_152_sat_baseline --save_checkpoint_every 6000 --val_images_use 5000 --max_epochs 30 --language_eval 1 --learning_rate 0.0001 --save_dir=sat-baseline --p-detach=0.4
+- Show Attend Tell - python train.py --id sat --caption_model show_attend_tell --input_json /folder/cocotalk.json --input_fc_dir /folder/cocotalk_fc --input_att_dir /folder/cocotalk_att --input_label_h5 folder/cocotalk_label.h5 --batch_size 10  --checkpoint_path logs/coco_152_sat_baseline --save_checkpoint_every 6000 --val_images_use 5000 --max_epochs 30 --language_eval 1 --learning_rate 0.0001 --save_dir=sat-baseline --p-detach=0.4
 
 
 ## Requirements ##
