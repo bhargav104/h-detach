@@ -18,6 +18,11 @@ To run copying task without h-detach, execute the following command:
 
 `python copying.py --save-dir=enter_experiment_dir_name_here --T=300 --seed=3`
 
+To run transfer copying task using a previously trained model for T=200 (or any other value), run:
+
+`python transfer_copy.py --T=200 --model-dir=enter_full_model_path`
+
+
 ## Sequential MNIST
 
 First uncomment and change the directory path for saving results on `line 30` of `pixelmnist.py`.
