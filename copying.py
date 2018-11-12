@@ -22,15 +22,17 @@ parser.add_argument('--T', type=int, default=300, help='T')
 parser.add_argument('--batch_size', type=int, default=100, help='batch size')
 parser.add_argument('--n_epochs', type=int, default=600, help='number of epochs')
 parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
+parser.add_argument('--anneal-p', type=int, default=40, help='number of epochs before total number of epochs for setting p-detach to 0')
 
 args = parser.parse_args()
 log_dir = '/directory/to/save/experiments/'+args.save_dir + '/'
 
 
-if os.path.isdir(log_dir):
-	if len(glob.glob(log_dir+'events.*'))>0:
-		print ('TensorBoard file exists by this name. Please delete it manually using \nrm -f {} \nor choose another save_dir.'.format(glob.glob(log_dir+'events.*')[0]))
-		exit(0)
+
+# if os.path.isdir(log_dir):
+# 	if len(glob.glob(log_dir+'events.*'))>0:
+# 		print ('TensorBoard file exists by this name. Please delete it manually using \nrm -f {} \nor choose another save_dir.'.format(glob.glob(log_dir+'events.*')[0]))
+# 		exit(0)
 
 writer = SummaryWriter(log_dir=log_dir)
 
@@ -112,6 +114,8 @@ def train_model(model, epochs, criterion, optimizer):
 	iters = -1
 	p_detach=0.
 	for epoch in range(start_epoch, epochs):
+		if epoch>epochs-args.anneal_p:
+			args.p_detach=-1
 		print('epoch ' + str(epoch + 1))
 		epoch_loss = 0
 		for z in tqdm.tqdm(range(train_size // batch_size), total=train_size // batch_size):
@@ -149,20 +153,19 @@ def train_model(model, epochs, criterion, optimizer):
 
 
 		t_loss, accuracy = test_model(model, test_x, test_y, criterion)
-		if accuracy > best_acc:
+		if accuracy >= best_acc:
 			best_acc = accuracy
 			print('best validation accuracy ' + str(best_acc))
+			print('Saving best model..')
+			state = {
+	        'net': model,
+	        'hid_size': hid_size
+	    	}
+			with open(log_dir + '/best_model.pt', 'wb') as f:
+				torch.save(state, f)
 		writer.add_scalar('/hdetach:val_acc', accuracy, epoch)
 
-		# print('Saving per epoch model..')
-		# state = {
-  #       'net': net,
-  #       'best_acc': best_acc,
-  #       'ctr': ctr,
-  #       'start_epoch': epoch,
-  #   	}
-		# with open(log_dir + '/last_model.pt', 'wb') as f:
-		# 	torch.save(state, f)
+
 
 
 print('==> Building model..')
